@@ -1,0 +1,60 @@
+#!/bin/sh
+
+$cwd=$PWD
+
+echo "";
+theme_name="";
+while [[ -z $theme_name ]]
+do
+echo "(required)";
+read -p "Theme Name: " theme_name;
+done;
+read -p "Theme URI: " theme_uri;
+read -p "Author: " author;
+read -p "Author URI: " author_uri;
+read -p "Description: " description;
+read -p "Version (1.0): " version;
+read -p "License (GNU v2): " license;
+read -p "License URI (http://www.gnu.org/licenses/gpl-2.0.html): " license_uri;
+read -p "Text Domain: " text_domain;
+read -p "Tags: " tags;
+read -p "Folder Name: (${theme_name}): " folder_name
+if [[ -z $version ]]; then
+version="1.0"
+fi;
+if [[ -z $license ]]; then
+license="GNU v2"
+fi;
+if [[ -z $license_uri ]]; then
+license_uri="http://www.gnu.org/licenses/gpl-2.0.html"
+fi;
+if [[ -z $folder_name ]]; then
+folder_name=$theme_name
+fi;
+
+git clone https://github.com/djpeach/base_theme.git $folder_name;
+rm -rf $folder_name/.git;
+
+cat >"$folder_name/scss/style.scss" <<EOF
+/*
+Theme Name: $theme_name
+Theme URI: $theme_uri
+Author: $author
+Author URI: $author_uri
+Description: $description
+Version: $version
+License: $license
+License URI: $license_uri
+Text Domain: $text_domain
+Tags: $tags
+*/
+// ================ ABSTRACTS ================ //
+@import "abstracts/mixins";
+@import "abstracts/variables";
+// =================== BASE ================== //
+@import "base/base";
+@import "base/typography";
+// ================ COMPONENTS =============== //
+// ================== PAGES ================== //
+@import "pages/front-page";
+EOF
