@@ -35,3 +35,7 @@ else
    echo "-> ${red}sfml is not installed, installing now${reset}";
    brew install sfml;
 fi
+
+git clone https://github.com/andrew-r-king/sfml-vscode-boilerplate.git .
+rm -rf .git
+rm .gitignore
