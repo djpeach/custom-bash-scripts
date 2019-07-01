@@ -64,10 +64,13 @@ then
 elif [[ $PLATFORM == "rpi" ]];
 then
   echo "-> ${green}Platform type: Raspberry Pi${reset}";
+  echo "Support for rasbian coming as update #1";
 elif [[ $PLATFORM == "linux" ]];
 then
   echo "-> ${green}Platform type: Linux${reset}";
+  echo "Support for rasbian coming as update #2";
 elif [[ $PLATFORM == "windows" ]];
 then
   echo "-> ${red}Lol good luck Tim${reset}";
+  echo "Support for windows unlikely unless you wish to contribute: https://github.com/djpeach/custom-bash-scripts";
 fi
