@@ -1,0 +1,102 @@
+#!/bin/sh
+
+yellow=$(tput setaf 228);
+green=$(tput setaf 71);
+white=$(tput setaf 15);
+red=$(tput setaf 124);
+bold=$(tput bold);
+reset=$(tput sgr0);
+
+# To add a color: echo "${color}"
+echo "${reset}"
+
+dir_name="";
+
+if [ -z $1 ]; then
+  echo "${red}Usage: create-sfml-game <directory name> <executable name>${reset}"
+  exit 1
+else
+  dir_name=$1;
+fi
+
+exe_name="";
+
+if [ -z $2 ]; then
+  exe_name=$1;
+else
+  exe_name=$2;
+fi
+
+if [[ $OSTYPE == 'linux-gnu'* || $OSTYPE == 'cygwin'* ]]; then
+	if [[ $OSTYPE == 'linux-gnueabihf' ]]; then
+		PLATFORM=rpi
+	else
+		PLATFORM=linux
+	fi
+elif [[ $OSTYPE == 'darwin'* ]]; then
+	PLATFORM=osx
+elif [[ $OSTYPE == 'msys' || $OSTYPE == 'win32' ]]; then
+	PLATFORM=windows
+fi
+
+install_mac() {
+  if type xcode-select >&- && xpath=$( xcode-select --print-path ) &&
+     test -d "${xpath}" && test -x "${xpath}";
+  then
+     echo "-> ${green}command line tools already installed${reset}";
+  else
+     echo "-> ${red}command line tools are not installed, installing now${reset}";
+     xcode-select --install 2>&1;
+  fi
+
+  if which brew >/dev/null
+  then
+     echo "-> ${green}homebrew already installed${reset}";
+  else
+     echo "-> ${red}homebrew is not installed, installing now${reset}";
+     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
+  fi
+
+  if brew list | grep sfml >/dev/null
+  then
+     echo "-> ${green}sfml already installed${reset}";
+  else
+     echo "-> ${red}sfml is not installed, installing now${reset}";
+     brew install sfml;
+  fi
+
+  if which cmake >/dev/null
+  then
+     echo "-> ${green}cmake already installed${reset}";
+  else
+     echo "-> ${red}cmake is not installed, installing now${reset}";
+     brew install cmake;
+  fi
+}
+
+get_boilerplate_mac() {
+  git clone https://github.com/djpeach/sfml-cmake-boilerplate.git $dir_name/;
+  rm -rf $dir_name/.git/;
+
+  sed -i '' "s/project_name/${exe_name}/" $dir_name/CMakeLists.txt;
+  sed -i '' "s/project_name/${exe_name}/" $dir_name/.gitignore;
+}
+
+if [[ $PLATFORM == "osx" ]];
+then
+  echo "-> ${green}Platform type: Mac OS X${reset}";
+  install_mac;
+  get_boilerplate_mac;
+elif [[ $PLATFORM == "rpi" ]];
+then
+  echo "-> ${green}Platform type: Raspberry Pi${reset}";
+  echo "Support for rasbian coming as update #1";
+elif [[ $PLATFORM == "linux" ]];
+then
+  echo "-> ${green}Platform type: Linux${reset}";
+  echo "Support for rasbian coming as update #2";
+elif [[ $PLATFORM == "windows" ]];
+then
+  echo "-> ${red}Lol good luck Tim${reset}";
+  echo "Support for windows unlikely unless you wish to contribute: https://github.com/djpeach/custom-bash-scripts";
+fi
