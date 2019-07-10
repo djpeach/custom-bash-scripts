@@ -10,6 +10,33 @@ reset=$(tput sgr0);
 # To add a color: echo "${color}"
 echo "${reset}"
 
+print_usage() {
+  echo "${bold}${white}Usage: al-run [options] <project name> <config file path> <logger file path>  ${reset}"
+}
+
+print_help() {
+  print_usage
+  echo "\nOptions:\n"
+  echo "-h"
+  echo "    show brief help"
+  echo "-s"
+  echo "    path to sfml source"
+  exit 0
+}
+
+sfml_source_path='~/SFML'
+
+while getopts ':hs:' opt; do
+  case "${opt}" in
+    h) print_help ;;
+    s) sfml_source_path=${OPTARG} ;;
+    *) print_usage
+       exit 1 ;;
+  esac
+done
+
+shift "$((OPTIND - 1))"
+
 if [[ $OSTYPE == 'linux-gnu'* || $OSTYPE == 'cygwin'* ]]; then
 	if [[ $OSTYPE == 'linux-gnueabihf' ]]; then
 		PLATFORM=rpi
@@ -72,6 +99,19 @@ install_pi() {
 	sudo apt-get install libfreetype6-dev
 	sudo apt-get install libudev-dev
 	sudo apt-get install libraspberrypi-dev
+
+	if [ -d $sfml_source_path ];
+	then
+		 echo "-> ${green}found sfml, compiling${reset}";
+	else
+		 echo "-> ${red}sfml was not found, cloning to ~/SFML ${reset}";
+	 	 git clone https://github.com/SFML/SFML.git ~/SFML/
+	fi
+	cmake -S ~/SFML/ -B ~/lib/SFMl/
+	pwd=$PWD
+	cd ~/lib/SFML/
+	make
+	cd $pwd
 }
 
 if [[ $PLATFORM == "osx" ]];
