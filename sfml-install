@@ -57,6 +57,23 @@ install_mac() {
   fi
 }
 
+install_pi() {
+	# install sfml library itself
+	sudo apt-get install libsfml-dev;
+
+	# install deps
+	sudo apt-get install cmake
+	sudo apt-get install cmake-gui
+	sudo apt-get install libflac-dev
+	sudo apt-get install libogg-dev
+	sudo apt-get install libvorbis-dev
+	sudo apt-get install libopenal-dev
+	sudo apt-get install libjpeg8-dev
+	sudo apt-get install libfreetype6-dev
+	sudo apt-get install libudev-dev
+	sudo apt-get install libraspberrypi-dev
+}
+
 if [[ $PLATFORM == "osx" ]];
 then
   echo "-> ${green}Platform type: Mac OS X${reset}";
