@@ -10,10 +10,37 @@ reset=$(tput sgr0);
 # To add a color: echo "${color}"
 echo "${reset}"
 
+print_usage() {
+  echo "${bold}${white}Usage: al-run [options] <project name> <config file path> <logger file path>  ${reset}"
+}
+
+print_help() {
+  print_usage
+  echo "\nOptions:\n"
+  echo "-h"
+  echo "    show brief help"
+  echo "-e"
+  echo "    get boilerplate engine"
+  exit 0
+}
+
+boilerplate_repo='https://github.com/djpeach/sfml-cmake-boilerplate.git'
+
+while getopts ':he' opt; do
+  case "${opt}" in
+    h) print_help ;;
+    e) boilerplate_repo="-b engine --single-branch https://github.com/djpeach/sfml-cmake-boilerplate.git" ;;
+    *) print_usage
+       exit 1 ;;
+  esac
+done
+
+shift "$((OPTIND - 1))"
+
 dir_name="";
 
 if [ -z $1 ]; then
-  echo "${red}Usage: create-sfml-game <directory name> <executable name>${reset}"
+  echo "${red}Usage: [options] create-sfml-game <directory name> [executable name]${reset}"
   exit 1
 else
   dir_name=$1;
@@ -75,7 +102,7 @@ install_mac() {
 }
 
 get_boilerplate_mac() {
-  git clone https://github.com/djpeach/sfml-cmake-boilerplate.git $dir_name/;
+  git clone $boilerplate_repo $dir_name/;
   rm -rf $dir_name/.git/;
 
   sed -i '' "s/project_name/${exe_name}/" $dir_name/CMakeLists.txt;
