@@ -1,0 +1,77 @@
+#!/bin/sh
+
+yellow=$(tput setaf 228);
+green=$(tput setaf 71);
+white=$(tput setaf 15);
+red=$(tput setaf 124);
+bold=$(tput bold);
+reset=$(tput sgr0);
+
+# To add a color: echo "${color}"
+echo "${reset}"
+
+print_usage() {
+  echo "${bold}${white}Usage: al-run [options] <project name> <config file path> <logger file path> \n run ${green}al-run -h${white} for more help  ${reset}"
+}
+
+print_help() {
+  print_usage
+  echo "\nOptions:\n"
+  echo "-h"
+  echo "    show brief help"
+  echo "-d"
+  echo "    run remote debugger on port 5005"
+  echo "-t"
+  echo "    run a test:compile"
+  echo "-p:"
+  echo "    port to run on"
+  echo "-c:"
+  echo "    use a common project definition. A list of commonly used projects:"
+  echo "        advertising"
+  echo "        service-provider"
+  exit 0
+}
+
+debug=false
+run_port='9000'
+common_project=''
+
+while getopts ':hdtp:c:' opt; do
+  case "${opt}" in
+    h) print_help ;;
+    d) debug=true ;;
+    p) run_port=${OPTARG} ;;
+    c) common_project=${OPTARG} ;;
+    t) sbt test:compile
+       exit 1 ;;
+    *) print_usage
+       exit 1 ;;
+  esac
+done
+
+shift "$((OPTIND - 1))"
+
+if [[ -z "$common_project" && (-z $1 || -z $2 || -z $3) ]]; then
+  print_usage
+  exit 1
+fi
+
+project_name=$1
+config_file=$2
+logger_file=$3
+
+debug_script=''
+
+if [ "$debug" = true ]; then
+  debug_script='-J-Xdebug -J-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
+fi
+
+if [ -z "$common_project" ]; then
+  sbt "project ${project_name}" -J-Dconfig.file=${config_file} -J-Dlogger.file=${logger_file} ${debug_script} "run ${run_port}"
+else
+  if [ $common_project = "advertising" ]; then
+    sbt "project advertising" -J-Dconfig.file=modules/advertising/conf/application-dev.conf -J-Dlogger.file=modules/advertising/conf/application-logger-dev.xml ${debug_script} "run ${run_port}"
+  elif [ $common_project = "service-provider" ]; then
+    sbt "project service-provider" -J-Dconfig.file=modules/service-provider/conf/application-remote.conf -J-Dlogger.file=modules/service-provider/conf/logback-local.xml ${debug_script} "run ${run_port}"
+  fi
+fi
