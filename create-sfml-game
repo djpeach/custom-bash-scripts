@@ -11,7 +11,7 @@ reset=$(tput sgr0);
 echo "${reset}"
 
 print_usage() {
-  echo "${bold}${white}Usage: al-run [options] <project name> <config file path> <logger file path>  ${reset}"
+  echo "${bold}${white}Usage: create-sfml-game [options] <directory path> <exe_name>  ${reset}"
 }
 
 print_help() {
@@ -48,7 +48,12 @@ fi
 
 exe_name="";
 
-if [ -z $2 ]; then
+if [[ -z $2 && -d $dir_name ]]; then
+  while [ -z $exe_name ]
+  do
+  read -p "Must provide exe_name if using existing directory: " exe_name;
+  done;
+elif [[ -z $2 && ! -d $dir_name ]]; then
   exe_name=$1;
 else
   exe_name=$2;
@@ -102,7 +107,13 @@ install_mac() {
 }
 
 get_boilerplate_mac() {
-  git clone $boilerplate_repo $dir_name/;
+  if [ -d "$dir_name" ]; then
+    git clone $boilerplate_repo "temp/";
+    cp -a "temp/" $dir_name/;
+    rm -rf "temp/";
+  else
+    git clone $boilerplate_repo $dir_name/;
+  fi
   rm -rf $dir_name/.git/;
 
   sed -i '' "s/project_name/${exe_name}/" $dir_name/CMakeLists.txt;
