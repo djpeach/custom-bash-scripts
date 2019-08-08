@@ -40,7 +40,7 @@ shift "$((OPTIND - 1))"
 dir_name="";
 
 if [ -z $1 ]; then
-  echo "${red}Usage: [options] create-sfml-game <directory name> [executable name]${reset}"
+  echo "${red}Usage: create-sfml-game <directory name> <executable name>${reset}"
   exit 1
 else
   dir_name=$1;
