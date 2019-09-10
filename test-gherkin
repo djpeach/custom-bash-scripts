@@ -1,0 +1,46 @@
+#!/bin/sh
+
+yellow=$(tput setaf 228);
+green=$(tput setaf 71);
+white=$(tput setaf 15);
+red=$(tput setaf 124);
+bold=$(tput bold);
+reset=$(tput sgr0);
+
+# To add a color: echo "${color}"
+echo "${reset}"
+
+print_usage() {
+  echo "${bold}${white}Usage: test-gherkin [options] <tag>\n run ${green}test-gherkin -h${white} for more help  ${reset}"
+}
+
+print_help() {
+  print_usage
+  echo "\nOptions:\n"
+  echo "-h"
+  echo "    show brief help"
+  echo "-s"
+  echo "    add a stage for setEnv.sh. Default is stagebravo"
+  exit 0
+}
+
+stage='stagebravo'
+
+while getopts ':hdtp:c:' opt; do
+  case "${opt}" in
+    h) print_help ;;
+    s) stage=${OPTARG} ;;
+    *) print_usage
+       exit 1 ;;
+  esac
+done
+
+shift "$((OPTIND - 1))"
+
+if [[ -z $1 ]]; then
+  print_usage
+  exit 1
+fi
+
+source setEnvironment.sh $stage
+npm run cucumber --silent -- --tags $1

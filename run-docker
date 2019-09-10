@@ -1,0 +1,35 @@
+#!/bin/sh
+
+yellow=$(tput setaf 228);
+green=$(tput setaf 71);
+white=$(tput setaf 15);
+red=$(tput setaf 124);
+bold=$(tput bold);
+reset=$(tput sgr0);
+
+echo "${bold}${white} --- running docker-compose downs ${reset}"
+docker-compose -f cucumber/node_modules/cucumber_js_common/docker-compose/docker-compose.yml down
+
+echo "${bold}${white} --- stopping any other docker containers ${reset}"
+docker stop $(docker ps -a -q)
+
+echo "${bold}${white} --- removing any other docker containers ${reset}"
+docker rm $(docker ps -a -q)
+
+echo "${bold}${white} --- running docker-compose ups ${reset}"
+docker-compose -f cucumber/node_modules/cucumber_js_common/docker-compose/docker-compose.yml up -d
+
+echo "${bold}${white} --- waiting for containers to initialize ${reset}"
+sleep 20
+
+echo "${bold}${white} --- running [$1] app on docker-compose_default network with build [$2] ${reset}"
+docker run -d -p 9009:9009 --name app --network="docker-compose_default" --env-file cucumber/node_modules/cucumber_js_common/docker-compose/set_environment.list angieslist/$1:$2
+
+echo "${bold}${white} --- waiting for app to initialize ${reset}"
+sleep 20
+
+echo "${bold}${white} --- attempting healthcheck on [$1] app ${reset}"
+docker run --network="docker-compose_default" appropriate/curl --retry 5 --retry-connrefused http://localhost:9009/healthcheck
+
+echo "${bold}${white} --- attempting healthcheck on zamboni ${reset}"
+docker run --network="docker-compose_default" appropriate/curl --retry 5 --retry-connrefused http://localhost:8000/refresh

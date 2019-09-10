@@ -11,7 +11,7 @@ reset=$(tput sgr0);
 echo "${reset}"
 
 print_usage() {
-  echo "${bold}${white}Usage: al-run [options] <project name> <config file path> <logger file path> \n run ${green}al-run -h${white} for more help  ${reset}"
+  echo "${bold}${white}Usage: alrun [options] <project name> <config file path> <logger file path> \n run ${green}alrun -h${white} for more help  ${reset}"
 }
 
 print_help() {
@@ -75,3 +75,4 @@ else
     sbt "project service-provider" -J-Dconfig.file=modules/service-provider/conf/application-remote.conf -J-Dlogger.file=modules/service-provider/conf/logback-local.xml ${debug_script} "run ${run_port}"
   fi
 fi
+curl http://localhost:9000/healthcheck?diagnostic=true
