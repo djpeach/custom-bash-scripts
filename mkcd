@@ -1,0 +1,54 @@
+#!/bin/sh
+
+yellow=$(tput setaf 228);
+green=$(tput setaf 71);
+white=$(tput setaf 15);
+red=$(tput setaf 124);
+bold=$(tput bold);
+smul=$(tput smul);
+rmul=$(tput rmul);
+reset=$(tput sgr0);
+
+echo "${reset}"
+
+print_usage() {
+  echo "${bold}${white}Usage: mkcd [-pv] [-m ${smul}mode${rmul}] <dir_path>\n run ${green}mkcd -h${white} for more help  ${reset}"
+}
+
+opts=''
+
+print_help() {
+  print_usage
+  echo "\nOptions:\n"
+  echo "-h"
+  echo "    show brief help"
+  echo "-p"
+  echo "    Create intermediate directories as required.  If this option is not specified, the full path prefix of each operand must already exist.  On the other hand, with this option specified, no error will be reported if a directory
+             given as an operand already exists.  Intermediate directories are created with permission bits of rwxrwxrwx (0777) as modified by the current umask, plus write and search permission for the owner."
+  echo "-v"
+  echo "    Be verbose when creating directories, listing them as they are created."
+  echo "-m"
+  echo "    Set the file permission bits of the final created directory to the specified mode.  The mode argument can be in any of the formats specified to the chmod(1) command.  If a symbolic mode is specified, the operation characters
+             ``+'' and ``-'' are interpreted relative to an initial mode of ``a=rwx''."
+  exit 0
+}
+
+while getopts 'hvpm:' opt; do
+  case "${opt}" in
+    h) print_help ;;
+    v) opts+="-v " ;;
+    p) opts+="-p " ;;
+    m) opts+="-m ${OPTARG} " ;;
+    *) print_usage
+       exit 1 ;;
+  esac
+done
+
+shift "$((OPTIND - 1))"
+
+if [[ -z $1 ]]; then
+  print_usage
+  exit 1
+fi
+
+mkdir ${opts} $1 && cd $1

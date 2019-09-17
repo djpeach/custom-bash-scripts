@@ -75,4 +75,5 @@ else
     sbt "project service-provider" -J-Dconfig.file=modules/service-provider/conf/application-remote.conf -J-Dlogger.file=modules/service-provider/conf/logback-local.xml ${debug_script} "run ${run_port}"
   fi
 fi
+sleep 20
 curl http://localhost:9000/healthcheck?diagnostic=true
