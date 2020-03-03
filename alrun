@@ -71,6 +71,10 @@ if [ -z "$common_project" ]; then
 else
   if [ $common_project = "advertising" ]; then
     sbt "project advertising" -J-Dconfig.file=modules/advertising/conf/application-dev.conf -J-Dlogger.file=modules/advertising/conf/application-logger-dev.xml ${debug_script} "run ${run_port}"
+  elif [ $common_project = "review" ]; then
+      sbt "project review" -J-Dconfig.file=modules/review/conf/application-local.conf -J-Dlogger.file=modules/review/conf/logback-local.xml ${debug_script} "run ${run_port}"
+  elif [ $common_project = "review-gateway" ]; then
+      sbt "project review-gateway" -J-Dconfig.file=conf/application-local.conf -J-Dlogger.file=conf/logback-local.xml ${debug_script} "run ${run_port}"
   elif [ $common_project = "service-provider" ]; then
     sbt "project service-provider" -J-Dconfig.file=modules/service-provider/conf/application-remote.conf -J-Dlogger.file=modules/service-provider/conf/logback-local.xml ${debug_script} "run ${run_port}"
   fi
